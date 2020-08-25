@@ -1,0 +1,336 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,margin=8mm]{geometry}
+\usepackage{xcolor}
+\usepackage{changepage}
+\usepackage[framemethod=TikZ]{mdframed}  % display boxes around text
+\usepackage{blindtext}
+\usepackage{enumitem}
+\usepackage{collectbox} % For creating bounding boxes
+
+\pagecolor[rgb]{0.156862745098,0.164705882353,0.211764705882}
+
+\newcommand{\bbox}{ % made /bbox command to make bounding box around text
+\collectbox{\color{green}\setlength{\fboxsep}{8pt} \fbox{\BOXCONTENT}}}
+
+\newcommand{\s}{\vspace{0.3cm}} % made /s command to create a vertical gap between text
+
+\definecolor{background}{RGB}{40, 42, 54}
+\definecolor{green}{RGB}{80, 250, 123}
+\definecolor{white}{RGB}{248, 248, 242}
+\definecolor{pink}{RGB}{255, 121, 198}
+
+\mdfdefinestyle{MyFrame}{%
+    linecolor=black,
+    outerlinewidth=0pt,
+    roundcorner=5pt,
+    innertopmargin=\baselineskip,
+    innerbottommargin=\baselineskip,
+    innerrightmargin=5pt,
+    innerleftmargin=5pt,
+    backgroundcolor=background}
+    
+\begin{document}
+
+\title{Installing Arch Linux alongside Windows 10} \color{green}
+\author{Created with \LaTeX\  using TEXmaker}
+\maketitle
+
+\noindent \color{white}
+Since the dual boot installation of Arch Linux is often difficult and confusing, I put together an instructional pdf designed to make the arch linux installation as easy as possible. Many are discouraged by the difficulty of installing Arch Linux, and they miss out on its potential ease of use, flexibility, and customization options it has to offer. By the end of this tutorial you should have a working dual boot machine.
+
+\color{pink}
+\section*{Technical Specifications} \color{white}
+\begin{adjustwidth}{0.5cm}{}
+\begin{description}[font=$\bullet$~\normalfont\scshape\color{green}] \color{white}
+\item Arch Linux version: 2019.12.01
+\item Included Kernel: 5.3.13
+\item Windows 10 Version 1803
+\item Tested using Dell Precision 5520 laptop
+\item Initially released on 12/12/2019
+
+\end{description}
+\end{adjustwidth}
+
+\color{pink}
+\section*{How this tutorial works} \color{white}
+
+\begin{adjustwidth}{0.5cm}{} %Adjusts width of indents
+
+
+\begin{description}[font=$\bullet$~\normalfont\scshape\color{green}]
+\item All code to be executed/edited will be displayed in a box
+\item This guide is for EFI systems (modern computers)
+\item There are 8 chapters to this tutorial, separated for an easier read
+\item If you follow all steps you will have a working Arch install and boot menu
+\end{description}
+
+\end{adjustwidth}
+
+\color{pink}
+\subsection*{Prerequisites} \color{white}
+\begin{adjustwidth}{0.5cm}{}
+First you will have to take care of some housekeeping things inside windows before we start.
+\end{adjustwidth}
+\color{pink}
+\subsubsection*{Create a free partition in Windows to make room for Arch:} \color{white}
+
+
+\begin{adjustwidth}{0.5cm}{}
+To do this go to Disk Manager in windows and locate the drive you want to dual boot from. This will require the drive to have free space available. Go ahead and right click the volume partition you want and select shrink partition. It will ask how much you want to shrink, select the amount of space you want the arch install to have for this. Next you will have to format this volume for it to show up in Arch Linux. Go ahead and right click on the new partition and select make new simple volume and format with NTFS.
+\end{adjustwidth}
+
+\color{pink}
+\subsubsection*{Disabling Windows Fast-Startup:} \color{white}
+
+\begin{adjustwidth}{0.5cm}{} %Adjusts width of indents
+You can disable this by going to: control panel$\rightarrow$power options$\rightarrow$choose what the power buttons do
+
+\end{adjustwidth}
+
+\color{pink}
+\subsubsection*{Disabling Secure Boot:} \color{white}
+
+\begin{adjustwidth}{0.5cm}{} %Adjusts width of indents
+
+On Windows 10, hold the Shift key while selecting restart. Go to Troubleshoot $\rightarrow$ Advanced Options $\rightarrow$ UEFI Firmware Settings. This will bring you to your computers BIOS, secure boot will most likely already be disabled so you shouldnt have to do anything here. Restart the computer to make sure any changes take effect.\\
+
+Great! Now we are ready to start making the bootable USB.
+\end{adjustwidth}
+
+\color{pink}
+\subsection*{Creating the Arch Linux boot partition with Rufus} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+This tutorial will use Rufus to create a bootable Arch Linux install using an ISO image. Go ahead and download the latest version of Rufus. Also download the Arch Linux ISO file. Note the ISO will download as a torrent, so you will need software capable of opening a torrent file.\\\\
+You can download the Arch Linux ISO from this link:\\
+https://www.archlinux.org/download/\\\\
+And download Rufus from this link:\\
+https://rufus.ie/
+\end{adjustwidth}
+\color{pink}
+\subsubsection*{Setting up Rufus} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+Launch Rufus and select these options to make the correct boot drive:\\
+\begin{adjustwidth}{0.5cm}{}
+Device $\rightarrow$ USB Device you will be using\\
+Boot selection $\rightarrow$ navigate to directory of downloaded ISO\\
+Partition Scheme $\rightarrow$ MBR\\
+Target System $\rightarrow$ BIOS or UEFI\\
+Volume Label $\rightarrow$ whatever you want\\
+File System $\rightarrow$ Fat32\\
+Cluster size $\rightarrow$ 4096 (default)\\
+\end{adjustwidth}
+
+
+Now go ahead and press start. The process may take a few minutes to complete, then close Rufus. You now have a bootable Arch linux USB.
+\end{adjustwidth}
+\color{pink}
+\section*{The Installation} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+Go ahead and plug the USB into the computer and boot into your BIOS. The button you have to press will differ with different PC's. Change the boot options in order to boot the USB first. Once it boots you should be presented with a welcome screen, then a terminal provided after a few seconds.
+\end{adjustwidth}
+\color{pink}
+\subsection*{Create partitions using cgdisk} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+Make sure you have allocated a free partition via Disk Manager in windows prior to doing this part. Also make sure to take note of the partition names that you will create. You will need them later.
+\end{adjustwidth}
+\color{pink}
+\subsubsection*{Create the swap partition:} \color{white}
+
+\begin{adjustwidth}{0.5cm}{} %Adjusts width of indents
+Go ahead and use cgdisk. Remember, boxes contain commands to be executed. \s \\
+\bbox{cgdisk} \s
+\end{adjustwidth}
+
+\begin{adjustwidth}{0.5cm}{}
+Then do the following:\\
+\begin{adjustwidth}{0.5cm}{}
+Select the free space partition, then select new\\
+Hit enter to select the default option for the first sector.\\
+Select your desired swap file size, for 2GB enter 2G\\
+Set swap name. Hit enter.
+
+\end{adjustwidth}
+\end{adjustwidth}
+\color{pink}
+\subsubsection*{Create the root partition:} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+Do the following:\\
+\begin{adjustwidth}{0.5cm}{}
+Select the free space partition, Hit New again.\\
+Hit enter to select the default option for the first sector.\\
+Hit enter again to use the remainder of the disk.\\
+Also hit enter for the GUID to select default.\\
+Then set name of the partition of root.\\
+\end{adjustwidth}
+Hit write at the bottom of the GUI to write changes to the disk. Enter "yes" to confirm the command. We are now done partitioning the disk. Select Quit to exit the cgdisk GUI.\\
+
+\noindent Go ahead and type this command to view the new partion table: \s \\
+\bbox{lsblk} \s \\
+Make sure both of the partitions you created are listed.
+\end{adjustwidth}
+\color{pink}
+\subsubsection*{Miscellaneous:} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+\noindent Now enable the swap partition. Replace sdax with the partition you use. \s \\
+\bbox{mkswap -L "Linux Swap" /dev/sdax} \s \\
+then do:\s \\
+\bbox{swapon /dev/sdax} \s \\
+\noindent Verify swap is activated: \s \\
+\bbox{free -m} \s \\
+\noindent Format root partition as ext4: \s \\
+\bbox{mkfs.ext4 /dev/sdax} \s \\
+\noindent Mount the root partition: \s \\
+\bbox{mkdir /mnt} \s \\
+then do: \s \\
+\bbox{mount /dev/sdax /mnt} \s \\
+\noindent For connecting to a WiFi network, use the command below. A GUI will appear and ask you to select a wireless network, then enter your wifi password. \s \\
+\bbox{wifi-menu} \s \\
+
+\end{adjustwidth}
+\color{pink}
+\section*{Install the base components} \color{white}
+\noindent
+\begin{adjustwidth}{0.5cm}{}
+\bbox{pacstrap /mnt base} 
+\end{adjustwidth}
+\color{pink}
+\section*{Mount the EFI Partition} \color{white}
+\noindent
+\begin{adjustwidth}{0.5cm}{}
+\bbox{mkdir -p /mnt/boot/efi} \s \\
+\noindent Next, check the partition table. You will need to take note of the EFI partition number here. \s \\
+\bbox{gdisk -l /dev/sdx} \s \\
+\noindent For example, if the EFI partition number is 2... then do this. \s \\
+\bbox{mount /dev/sda2 /mnt/boot/efi}
+\end{adjustwidth}
+
+\color{pink}
+\section*{Generate fstab and chroot into the system} \color{white}
+\begin{adjustwidth}{0.5cm}{}
+\bbox{genfstab -p /mnt $>>$ /mnt/etc/fstab} \s \\
+\noindent Check the fstab \s \\
+\bbox{cat /mnt/etc/fstab} \s \\
+Chroot into system now \s \\
+\bbox{arch-chroot /mnt}
+\end{adjustwidth}
+
+\color{pink}
+\section*{Setting Locale} \color{white}
+\begin{adjustwidth}{0.5cm}{}
+The Locale defines which language the system uses, and other regional considerations such as currency denomination, numerology, and character sets. First download nano, a text editor. \s \\
+\bbox{sudo pacman -S nano} \s \\
+Now open the the file below using nano and uncomment your language. Save the file when done by using CTRL-O to write and CTRL-X to quit. \s \\
+\bbox{nano /etc/locale.gen} \s \\
+
+\noindent Now generate new locales: \s \\
+\bbox{locale-gen} \s \\
+\bbox{\texttt{echo 'LANG=en\_US.UTF-8' > /etc/locale.conf}} \s \\
+\bbox{\texttt{export LANG=en\_US.UTF-8}} \s \\
+Now set the time. Indianapolis, Indiana used for example: \s \\
+\bbox{ln -s /usr/share/zoneinfo/America/Indiana/Indianapolis} \s \\
+It is recommended to adjust the time skew, and set the time standard to UTC: \s \\
+\bbox{hwclock --systohc --utc} \s \\
+Set the hostname: \s \\
+\bbox{echo 'arch' $>$ /etc/hostname} \s \\
+For wifi install: \s \\
+\bbox{\texttt{pacman -S iw wpa\_supplicant dialog}} \s \\
+\noindent Enable multilib and AUR repositories in /etc/pacman.conf: \s \\
+\bbox{nano /etc/pacman.conf} \s \\
+
+\noindent Uncomment the lines starting with [multilib] \s \\
+Add the following lines at the end of /etc/pacman.conf:
+\begin{verbatim}
+[archlinuxfr]
+SigLevel = Never
+Server = http://repo.archlinux.fr/\$arch
+\end{verbatim}
+
+\noindent Download two packages before using mkinitcpio \s \\
+\bbox{sudo pacman -S linux linux-firmware} \s \\
+\noindent Generate the initramfs image: \s \\
+\bbox{mkinitcpio -p linux} \s \\
+\noindent Change the root password: \s \\
+\bbox{passwd root} \s \\
+\noindent Then add user with your name. Example provided with name Benjamin and username ben. \s \\
+\noindent \bbox{useradd -m -g users -G wheel,storage,power,video -s /bin/bash -c "Benjamin" ben} \s \\
+\noindent Set password for the ben user. \s \\
+\bbox{passwd ben} \s \\
+\noindent Download vim text editor, and add new user to sudoers after entering visudo: \s \\
+\bbox{sudo pacman -S vim} \s \\
+\bbox{visudo} 
+
+\begin{verbatim}Uncomment # %wheel ALL=(ALL) ALL
+\end{verbatim}
+\end{adjustwidth}
+
+\color{pink}
+\section*{Grub bootloader Installation} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+
+Download needed packages: \s \\
+\bbox{pacman -Syu grub efibootmgr} \s \\
+
+Install grub to your drive. For example, my partitions are on sda drive so I would type sda. NOT sda1, sda2... etc. \s \\
+\bbox{grub-install /dev/sdx} \s \\
+Generate grub config. You will not see Windows listed here when executed, this is normal. \s \\
+\bbox{grub-mkconfig -o /boot/grub/grub.cfg} \s \\
+Verify if grub installed, type: \s \\
+\bbox{ls -l /boot/efi/EFI/arch/} \s \\
+
+\end{adjustwidth}
+\color{pink}
+\section*{Graphical environment installation} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+This section will provide installation packages for either GNOME or KDE PLASMA to choose from. \\
+
+If you are using Gnome, here are the packages needed: \s \\
+\bbox{pacman -S gnome-system-monitor gnome-shell nautilus gnome-terminal gnome-tweak-tool} \s \\
+\bbox{gnome-control-center xdg-user-dirs networkmanager gnome-keyring network-manager-applet xorg gdm} \s \\
+If you are using KDE Plasma, here are the packages needed: \s \\
+\bbox{pacman -S xdg-user-dirs networkmanager network-manager-applet xorg sddm plasma kde-applications} \s \\
+If you are using GNOME: \s \\
+\bbox{systemctl enable gdm} \s \\
+If you are using KDE Plasma: \s \\
+\bbox{systemctl enable sddm} \s \\
+
+\noindent Enable networking: \s \\
+\bbox{systemctl enable NetworkManager} \s \\
+
+\noindent You can now reboot into your Arch Install, note that the boot manager will not work yet. You will have to make sure the Arch install is set to boot first instead of the USB. Go ahead and exit chroot and reboot. \s \\
+\bbox{exit} \s \\
+\bbox{reboot} \s \\
+
+\noindent Once you are booted into Arch linux, you will be presented with a login screen. Go ahead and enter your username and password to enter. Enter a terminal and download os-prober. \s \\
+\bbox{sudo pacman -Syu os-prober} \s \\
+
+\noindent Then generate the grub config. When this executes you should see it find windows as an option. \s \\
+\bbox{grub-mkconfig -o /boot/grub/grub.cfg} \s \\
+
+\noindent Reboot and you will see that you now have an option to boot windows 10 or Arch Linux! You are all set!
+\end{adjustwidth}
+
+\color{pink}
+\section*{Sources used for Article} \color{white}
+
+\begin{adjustwidth}{0.5cm}{}
+
+A lot of information was used from these two sources, some information was outdated and had to be fixed for this tutorial to work.
+
+\begin{verbatim}
+http://www.abhishekan.me/linux/arch/2019/04/02/Dual-Boot-Arch-\\Linux-With-
+Windows-(UEFI).html
+
+https://wiki.archlinux.org/index.php/Installation_guide
+\end{verbatim}
+\end{adjustwidth}
+
+\end{document}
